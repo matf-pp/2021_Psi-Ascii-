@@ -1,6 +1,6 @@
 module Main where
 
-import Asciic
+import Game
 
 main :: IO ()
-main = sayHi 
+main = runGame 
