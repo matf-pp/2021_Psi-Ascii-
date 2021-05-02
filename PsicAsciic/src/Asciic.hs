@@ -9,10 +9,10 @@ module Asciic
 import Hrana
 
 data Uzrast = Beba
-             | Dete
-             | Tinejdzer
-             | Dzukac
-             deriving (Show, Read, Eq, Ord)
+            | Dete
+            | Tinejdzer
+            | Dzukac
+            deriving (Show, Read, Eq, Ord)
 
 data Zanimanje = Slikar
                | Muzicar
@@ -82,28 +82,28 @@ promeniVlasnika psic noviVlasnik = psic { vlasnik = noviVlasnik }
 
 nahrani :: Psic -> Hrana -> Psic
 nahrani psic Hrana.Hleb
-    | gladnost psic == Umire = psic { gladnost = Gladan }
-    | gladnost psic == Gladan = psic { gladnost = Sit }
-    | gladnost psic == Sit = psic { gladnost = Prejeden }
+    | gladnost psic == Umire    = psic { gladnost = Gladan }
+    | gladnost psic == Gladan   = psic { gladnost = Sit }
+    | gladnost psic == Sit      = psic { gladnost = Prejeden }
     | gladnost psic == Prejeden = psic { stanje = Uginuo } 
 
 nahrani psic Hrana.Kost
-    | gladnost psic == Umire = psic { gladnost = Gladan }
-    | gladnost psic == Gladan = psic { gladnost = Sit }
-    | gladnost psic == Sit = psic { gladnost = Prejeden }
+    | gladnost psic == Umire    = psic { gladnost = Gladan }
+    | gladnost psic == Gladan   = psic { gladnost = Sit }
+    | gladnost psic == Sit      = psic { gladnost = Prejeden }
     | gladnost psic == Prejeden = psic { stanje = Uginuo }
 
 nahrani psic Hrana.Meso
-    | gladnost psic == Umire = psic { gladnost = Sit }
-    | gladnost psic == Gladan = psic { gladnost = Prejeden }
-    | gladnost psic == Sit = psic { gladnost = Prejeden }
+    | gladnost psic == Umire    = psic { gladnost = Sit }
+    | gladnost psic == Gladan   = psic { gladnost = Prejeden }
+    | gladnost psic == Sit      = psic { gladnost = Prejeden }
     | gladnost psic == Prejeden = psic { stanje = Uginuo }
 
 igrajSe :: Psic -> Psic
 igrajSe psic 
-    | gladnost psic == Umire = psic { stanje = Uginuo }
-    | gladnost psic == Gladan = psic { stanje = IgraSe, gladnost = Umire}
-    | gladnost psic == Sit = psic { stanje = IgraSe, gladnost = Gladan}
+    | gladnost psic == Umire    = psic { stanje = Uginuo }
+    | gladnost psic == Gladan   = psic { stanje = IgraSe, gladnost = Umire}
+    | gladnost psic == Sit      = psic { stanje = IgraSe, gladnost = Gladan}
     | gladnost psic == Prejeden = psic { stanje = IgraSe, gladnost = Sit}
 
 sayHi :: IO ()

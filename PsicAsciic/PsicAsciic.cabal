@@ -26,12 +26,15 @@ source-repository head
 library
   exposed-modules:
       Asciic
+      Hrana
+      Input
   other-modules:
       Paths_PsicAsciic
   hs-source-dirs:
       src
   build-depends:
       base >=4.7 && <5
+    , ncurses
   default-language: Haskell2010
 
 executable PsicAsciic-exe
@@ -44,6 +47,7 @@ executable PsicAsciic-exe
   build-depends:
       PsicAsciic
     , base >=4.7 && <5
+    , ncurses
   default-language: Haskell2010
 
 test-suite PsicAsciic-test
@@ -57,4 +61,5 @@ test-suite PsicAsciic-test
   build-depends:
       PsicAsciic
     , base >=4.7 && <5
+    , ncurses
   default-language: Haskell2010
