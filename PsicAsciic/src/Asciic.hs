@@ -1,110 +1,104 @@
 module Asciic
-    ( sayHi
-    , rodiPsica
-    , imenujPsica
-    , igrajSe
-    , nahrani
+    ( StatePsic(..)
+    , Psic(..)
+    , defaultPsic 
+    , asciic
+    , moodLevel
+    , hungerLevel
+    , dirtinessLevel
     ) where
 
-import Hrana
+import Data.Range
+import UI.NCurses
+import Linear
+import Food
 
-data Uzrast = Beba
-            | Dete
-            | Tinejdzer
-            | Dzukac
-            deriving (Show, Read, Eq, Ord)
-
-data Zanimanje = Slikar
-               | Muzicar
-               | NemaZanimanje
+data StatePsic = Alive
+               | Dead
                deriving (Show, Read, Eq)
 
-data Gladnost = Umire
-              | Gladan
-              | Sit
-              | Prejeden
-              deriving (Show, Read, Eq, Ord)
-
-data Raspolozenje = Ljut
-                  | Smoren
-                  | Srecan
-                  | Uzbudjen
-                  deriving (Show, Read, Eq, Ord)
-
-data Stanje = Spava
-            | IgraSe
-            | Radi
-            | Postoji
-            | Uginuo
-            deriving (Show, Read, Eq)
-
 data Psic = Psic 
-    { ime :: String
-    , vlasnik :: String 
-    , uzrast :: Uzrast 
-    , zanimanje :: Zanimanje
-    , gladnost :: Gladnost
-    , raspolozenje :: Raspolozenje
-    , stanje :: Stanje 
-    } deriving Read
+    { name      :: String
+    , owner     :: String 
+    , age       :: Int
+    , hunger    :: Int
+    , mood      :: Int
+    , dirtiness :: Int
+    , state     :: StatePsic
+    } deriving (Show, Read)
 
-instance Show Psic where 
-    show psic = "Ime: " ++ ime psic ++ "   " 
-        ++ "Vlasnik: " ++ show (vlasnik psic) ++ "   "
-        ++ "Uzrast: " ++ show (uzrast psic) ++ "   " 
-        ++ "Zanimanje: " ++ show (zanimanje psic) ++ "\n\n"
-        ++ "\t\t\t /^ ^\\\n"
-        ++ "\t\t\t/ 0 0 \\\n"
-        ++ "\t\t\tV\\ Y /V\n"
-        ++ "\t\t\t / - \\\n"
-        ++ "\t\t\t/    |\n"
-        ++ "\t\t\tV__) ||\n\n"
-        ++ "Stanje: " ++ show (stanje psic) ++ "   "
-        ++ "Raspolozenje: " ++ show (raspolozenje psic) ++ "   " 
-        ++ "Gladnost: " ++ show (gladnost psic) ++ "\n\n"
+asciic :: String
+asciic  = " /^ ^\\\n"
+       ++ "/ 0 0 \\\n"
+       ++ "V\\ Y /V\n"
+       ++ " / - \\\n"
+       ++ "/    |\n"
+       ++ "V__) ||\n"
 
-rodiPsica :: Psic
-rodiPsica = Psic 
-    { ime = "Asciic"
-    , vlasnik = "Igor"
-    , uzrast = Beba
-    , zanimanje = NemaZanimanje
-    , gladnost = Gladan
-    , raspolozenje = Uzbudjen
-    , stanje = Postoji
+--asciic2Glyphs :: String -> [(V2 Int Int, Glyph)]
+--asciic2Glyphs str = 
+
+defaultPsic :: Psic
+defaultPsic = Psic 
+    { name      = "Asciic"
+    , owner     = "Igor"
+    , age       = 0
+    , hunger    = 50
+    , mood      = 53 
+    , dirtiness = 50
+    , state     = Alive
     }
 
-imenujPsica :: Psic -> String -> Psic
-imenujPsica psic novoIme = psic { ime = novoIme }
+fLevel :: (Psic -> Int) -> Psic -> Integer
+fLevel f psic
+    | inRange ( 0 +=+  5) (f psic) = 0
+    | inRange ( 6 +=+ 10) (f psic) = 1
+    | inRange (11 +=+ 15) (f psic) = 2
+    | inRange (16 +=+ 20) (f psic) = 3
+    | inRange (21 +=+ 25) (f psic) = 4
+    | otherwise                    = 5
 
-promeniVlasnika :: Psic -> String -> Psic
-promeniVlasnika psic noviVlasnik = psic { vlasnik = noviVlasnik }
+hungerLevel :: Psic -> Integer
+hungerLevel = fLevel hunger
 
-nahrani :: Psic -> Hrana -> Psic
-nahrani psic Hrana.Hleb
-    | gladnost psic == Umire    = psic { gladnost = Gladan }
-    | gladnost psic == Gladan   = psic { gladnost = Sit }
-    | gladnost psic == Sit      = psic { gladnost = Prejeden }
-    | gladnost psic == Prejeden = psic { stanje = Uginuo } 
+moodLevel :: Psic -> Integer
+moodLevel = fLevel mood
 
-nahrani psic Hrana.Kost
-    | gladnost psic == Umire    = psic { gladnost = Gladan }
-    | gladnost psic == Gladan   = psic { gladnost = Sit }
-    | gladnost psic == Sit      = psic { gladnost = Prejeden }
-    | gladnost psic == Prejeden = psic { stanje = Uginuo }
+dirtinessLevel :: Psic -> Integer
+dirtinessLevel = fLevel dirtiness
 
-nahrani psic Hrana.Meso
-    | gladnost psic == Umire    = psic { gladnost = Sit }
-    | gladnost psic == Gladan   = psic { gladnost = Prejeden }
-    | gladnost psic == Sit      = psic { gladnost = Prejeden }
-    | gladnost psic == Prejeden = psic { stanje = Uginuo }
+feed :: Food -> Psic -> Psic
+feed food oldPsic = oldPsic -- TODO: Implement for all types of food!
 
-igrajSe :: Psic -> Psic
-igrajSe psic 
-    | gladnost psic == Umire    = psic { stanje = Uginuo }
-    | gladnost psic == Gladan   = psic { stanje = IgraSe, gladnost = Umire}
-    | gladnost psic == Sit      = psic { stanje = IgraSe, gladnost = Gladan}
-    | gladnost psic == Prejeden = psic { stanje = IgraSe, gladnost = Sit}
+--imenujPsica :: Psic -> String -> Psic
+--imenujPsica psic novoIme = psic { ime = novoIme }
 
-sayHi :: IO ()
-sayHi = putStrLn "Hi I'm Psic Asciic!"
+--promeniVlasnika :: Psic -> String -> Psic
+--promeniVlasnika psic noviVlasnik = psic { vlasnik = noviVlasnik }
+
+--nahrani :: Psic -> Hrana -> Psic
+--nahrani psic Hrana.Hleb
+    -- | gladnost psic == Umire    = psic { gladnost = Gladan }
+    -- | gladnost psic == Gladan   = psic { gladnost = Sit }
+    -- | gladnost psic == Sit      = psic { gladnost = Prejeden }
+    -- | gladnost psic == Prejeden = psic { stanje = Uginuo } 
+
+--nahrani psic Hrana.Kost
+    -- | gladnost psic == Umire    = psic { gladnost = Gladan }
+    -- | gladnost psic == Gladan   = psic { gladnost = Sit }
+    -- | gladnost psic == Sit      = psic { gladnost = Prejeden }
+    -- | gladnost psic == Prejeden = psic { stanje = Uginuo }
+
+--nahrani psic Hrana.Meso
+    -- | gladnost psic == Umire    = psic { gladnost = Sit }
+    -- | gladnost psic == Gladan   = psic { gladnost = Prejeden }
+    -- | gladnost psic == Sit      = psic { gladnost = Prejeden }
+    -- | gladnost psic == Prejeden = psic { stanje = Uginuo }
+
+--igrajSe :: Psic -> Psic
+--igrajSe psic 
+    -- | gladnost psic == Umire    = psic { stanje = Uginuo }
+    -- | gladnost psic == Gladan   = psic { stanje = IgraSe, gladnost = Umire}
+    -- | gladnost psic == Sit      = psic { stanje = IgraSe, gladnost = Gladan}
+    -- | gladnost psic == Prejeden = psic { stanje = IgraSe, gladnost = Sit}
+

@@ -26,8 +26,8 @@ source-repository head
 library
   exposed-modules:
       Asciic
+      Food
       Game
-      Hrana
       Input
   other-modules:
       Paths_PsicAsciic
@@ -35,7 +35,9 @@ library
       src
   build-depends:
       base >=4.7 && <5
+    , linear
     , ncurses
+    , range
   default-language: Haskell2010
 
 executable PsicAsciic-exe
@@ -48,7 +50,9 @@ executable PsicAsciic-exe
   build-depends:
       PsicAsciic
     , base >=4.7 && <5
+    , linear
     , ncurses
+    , range
   default-language: Haskell2010
 
 test-suite PsicAsciic-test
@@ -62,5 +66,7 @@ test-suite PsicAsciic-test
   build-depends:
       PsicAsciic
     , base >=4.7 && <5
+    , linear
     , ncurses
+    , range
   default-language: Haskell2010
