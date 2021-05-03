@@ -3,6 +3,8 @@ module Game (runGame, drawAsciic) where
 import qualified Data.Map as Map
 import Data.String
 import Control.Monad ( when )
+import Control.Monad.IO.Class ( liftIO )
+import System.Random
 import Input
 import Linear
 import Asciic
@@ -16,6 +18,7 @@ type Inventory = Map.Map Food Int
 
 data Game = Game 
     { running   :: Bool 
+    , stdGen    :: StdGen
     , psic      :: Psic
     , inventory :: Inventory
     } deriving Show
@@ -23,11 +26,21 @@ data Game = Game
 initialInventory :: Inventory
 initialInventory = Map.fromList [(Water, 10), (Bone, 5), (Meat, 3)]
 
-initialGame :: Game
-initialGame = Game True defaultPsic initialInventory 
+initialGame :: StdGen -> Game
+initialGame gen = Game True gen defaultPsic initialInventory 
 
 update :: EventGame -> Game -> Game
 update Quit game = game { running = False }
+update Idle game@(Game _ _ psic inventory) = 
+    let newMood     = mood psic - 2
+        newHunger   = hunger psic - 5
+    in game { psic      = psic { mood = newMood
+                               , hunger = newHunger } 
+            , inventory = Map.adjust (+2) Water 
+                        $ Map.adjust (+1) Bone 
+                        $ Map.adjust (+1) Meat
+                        $ inventory
+            }
 update _    game = game -- Implement other actions
 
 inventoryLookup :: Food -> Inventory -> Integer
@@ -88,7 +101,7 @@ footer = do
     drawString "(Press q to quit)"
 
 drawGame :: Game -> Update ()
-drawGame (Game _ psicState inventoryState) = do
+drawGame (Game _ _ psicState inventoryState) = do
     moveCursor 0 0
     hBar
     header
@@ -111,13 +124,18 @@ renderGame game = do
 loop :: Game -> Curses ()
 loop oldGame = do
     renderGame oldGame
-    event <- nextEvent
-    let newGame = update event oldGame
-    when (running newGame) $
+    gen       <- liftIO $ newStdGen
+    event     <- nextEvent
+    randEvent <- randomEvent gen
+    let newGame = update randEvent 
+                $ update event oldGame 
+                    { stdGen = gen }
+    when (running newGame) $ do
         loop newGame
 
 runGame :: IO ()
 runGame = runCurses $ do
     setEcho False
     setCursorMode CursorInvisible
-    loop initialGame
+    gen <- liftIO $ getStdGen
+    loop $ initialGame gen

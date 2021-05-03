@@ -25,6 +25,7 @@ dependencies:
 - ncurses
 - range
 - containers
+- random
 
 library:
   source-dirs: src

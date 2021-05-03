@@ -38,6 +38,7 @@ library
     , containers
     , linear
     , ncurses
+    , random
     , range
   default-language: Haskell2010
 
@@ -54,6 +55,7 @@ executable PsicAsciic-exe
     , containers
     , linear
     , ncurses
+    , random
     , range
   default-language: Haskell2010
 
@@ -71,5 +73,6 @@ test-suite PsicAsciic-test
     , containers
     , linear
     , ncurses
+    , random
     , range
   default-language: Haskell2010
