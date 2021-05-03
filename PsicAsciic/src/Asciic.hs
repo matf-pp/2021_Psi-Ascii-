@@ -3,15 +3,15 @@ module Asciic
     , Psic(..)
     , defaultPsic 
     , asciic
+    , feed
     , moodLevel
     , hungerLevel
     , dirtinessLevel
     ) where
 
 import Data.Range
-import UI.NCurses
-import Linear
 import Food
+
 
 data StatePsic = Alive
                | Dead
@@ -27,6 +27,7 @@ data Psic = Psic
     , state     :: StatePsic
     } deriving (Show, Read)
 
+
 asciic :: String
 asciic  = " /^ ^\\\n"
        ++ "/ 0 0 \\\n"
@@ -34,9 +35,6 @@ asciic  = " /^ ^\\\n"
        ++ " / - \\\n"
        ++ "/    |\n"
        ++ "V__) ||\n"
-
---asciic2Glyphs :: String -> [(V2 Int Int, Glyph)]
---asciic2Glyphs str = 
 
 defaultPsic :: Psic
 defaultPsic = Psic 
@@ -68,37 +66,11 @@ dirtinessLevel :: Psic -> Integer
 dirtinessLevel = fLevel dirtiness
 
 feed :: Food -> Psic -> Psic
-feed food oldPsic = oldPsic -- TODO: Implement for all types of food!
-
---imenujPsica :: Psic -> String -> Psic
---imenujPsica psic novoIme = psic { ime = novoIme }
-
---promeniVlasnika :: Psic -> String -> Psic
---promeniVlasnika psic noviVlasnik = psic { vlasnik = noviVlasnik }
-
---nahrani :: Psic -> Hrana -> Psic
---nahrani psic Hrana.Hleb
-    -- | gladnost psic == Umire    = psic { gladnost = Gladan }
-    -- | gladnost psic == Gladan   = psic { gladnost = Sit }
-    -- | gladnost psic == Sit      = psic { gladnost = Prejeden }
-    -- | gladnost psic == Prejeden = psic { stanje = Uginuo } 
-
---nahrani psic Hrana.Kost
-    -- | gladnost psic == Umire    = psic { gladnost = Gladan }
-    -- | gladnost psic == Gladan   = psic { gladnost = Sit }
-    -- | gladnost psic == Sit      = psic { gladnost = Prejeden }
-    -- | gladnost psic == Prejeden = psic { stanje = Uginuo }
-
---nahrani psic Hrana.Meso
-    -- | gladnost psic == Umire    = psic { gladnost = Sit }
-    -- | gladnost psic == Gladan   = psic { gladnost = Prejeden }
-    -- | gladnost psic == Sit      = psic { gladnost = Prejeden }
-    -- | gladnost psic == Prejeden = psic { stanje = Uginuo }
-
---igrajSe :: Psic -> Psic
---igrajSe psic 
-    -- | gladnost psic == Umire    = psic { stanje = Uginuo }
-    -- | gladnost psic == Gladan   = psic { stanje = IgraSe, gladnost = Umire}
-    -- | gladnost psic == Sit      = psic { stanje = IgraSe, gladnost = Gladan}
-    -- | gladnost psic == Prejeden = psic { stanje = IgraSe, gladnost = Sit}
+feed food psic = psic 
+    { mood      = m + moodValue food
+    , hunger    = h + hungerValue food
+    , dirtiness = d + dirtinessValue food 
+    } where m = mood psic
+            h = hunger psic
+            d = dirtiness psic
 
