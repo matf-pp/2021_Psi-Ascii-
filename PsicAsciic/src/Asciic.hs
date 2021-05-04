@@ -16,6 +16,7 @@ import Food
 
 
 data StatePsic = Alive
+               | Bored
                | Dead
                deriving (Show, Read, Eq)
 
@@ -34,15 +35,24 @@ data Psic = Psic
 
 updatePsicMood :: Int -> Psic -> Psic
 updatePsicMood newMood psic
-    | newMood < 0   = psic { mood = 0 }
+    | newMood < 0   = psic { mood     = 0
+                           , state    = Bored
+                           , psicSays = "Amuse me or I will die. I am dead serious. :|"
+                           , psicLook = asciicBored }
     | newMood > 100 = psic { mood = 100 }
     | otherwise     = psic { mood = newMood }
 
 updatePsicHunger :: Int -> Psic -> Psic
 updatePsicHunger newHunger psic
-    | newHunger < 0   = psic { hunger = 0 }
-    | newHunger > 100 = psic { hunger = 0, state = Dead, psicLook = asciicDead }
-    | otherwise       = psic { hunger = newHunger }
+    | newHunger < 0   = psic { hunger   = 0 }
+    | newHunger > 100 = psic { hunger   = 0
+                             , mood     = 0
+                             , state    = Dead
+                             , psicSays = "I died from starvation. You are terrible owner :("
+                             , psicLook = asciicDead }
+    | otherwise       = psic { hunger = newHunger
+                             , state = Alive
+                             , psicLook = asciic }
 
 updatePsicDirtiness :: Int -> Psic -> Psic
 updatePsicDirtiness newDirtiness psic
@@ -66,8 +76,8 @@ asciicDead  = " /^ ^\\\n"
        ++ "/    |\n"
        ++ "V__) ||\n"
 
-asciicAngry :: String
-asciicAngry  = " /^ ^\\\n"
+asciicBored :: String
+asciicBored  = " /^ ^\\\n"
        ++ "/ - - \\\n"
        ++ "V\\ Y /V\n"
        ++ " / - \\\n"

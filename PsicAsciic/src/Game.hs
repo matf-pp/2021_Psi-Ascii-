@@ -68,24 +68,22 @@ update Play game@(Game _ oldGen psic _) =
                                }
             }
 update Clean game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (0,  5) oldGen 
-        (randHunger, newGen')       = randomR (0,  5) newGen
-        (randDirtiness, newGen'')   = randomR (0, 10) newGen'
-        newMood                     = mood psic - randMood
-        newHunger                   = hunger psic - randHunger
+    let (randMood, newGen)          = randomR (0,  10) oldGen 
+        (randDirtiness, newGen')   = randomR (20, 80) newGen
+        newMood                     = mood psic + randMood
         newDirtiness                = dirtiness psic - randDirtiness
-    in game { stdGen    = newGen''
+    in game { stdGen    = newGen'
             , psic      = updatePsicMood newMood
-                        $ updatePsicHunger newHunger
                         $ updatePsicDirtiness newDirtiness
                         $ psic { psicSays = "Wash washy wash washy wash wash!" }
             }
+
 update Poop game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (0, 20) oldGen 
-        (randHunger, newGen')       = randomR (0, 10) newGen
-        (randDirtiness, newGen'')   = randomR (0, 20) newGen'
+    let (randMood, newGen)          = randomR (0, 10) oldGen 
+        (randHunger, newGen')       = randomR (0, 5) newGen
+        (randDirtiness, newGen'')   = randomR (10, 30) newGen'
         newMood                     = mood psic - randMood
-        newHunger                   = hunger psic - randHunger
+        newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen''
             , psic      = updatePsicMood newMood
@@ -97,7 +95,7 @@ update Poop game@(Game _ oldGen psic _) =
             }
 update Hunger game@(Game _ oldGen psic _) =
     let (randMood, newGen)          = randomR (0, 10) oldGen 
-        (randHunger, newGen')       = randomR (0, 20) newGen
+        (randHunger, newGen')       = randomR (10, 30) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic - randMood
         newHunger                   = hunger psic + randHunger
@@ -111,10 +109,10 @@ update Hunger game@(Game _ oldGen psic _) =
                                }
             }
 update Sleep game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (0, 5) oldGen 
+    let (randMood, newGen)          = randomR (5, 10) oldGen 
         (randHunger, newGen')       = randomR (0, 5) newGen
         (randDirtiness, newGen'')   = randomR (0, 5) newGen'
-        newMood                     = mood psic - randMood
+        newMood                     = mood psic + randMood
         newHunger                   = hunger psic - randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen''
@@ -211,7 +209,7 @@ renderGame game = do
     render
 
 loop :: Game -> Curses ()
-loop oldGame = do
+loop oldGame = if ((state (psic oldGame)) /= Dead) then (do 
     renderGame oldGame
     gen       <- liftIO $ newStdGen
     event     <- nextEvent
@@ -221,6 +219,30 @@ loop oldGame = do
                     { stdGen = gen }
     when (running newGame) $ do
         loop newGame
+    )   
+
+    else (do
+        renderGame oldGame
+        gen       <- liftIO $ newStdGen
+        event     <- nextEvent
+        let noviPsic = (psic oldGame) { hunger    = 0
+                                      , mood      = 0
+                                      , dirtiness = 0
+                                      , state = Dead
+                                      , psicSays  = "I died from starvation. You are terrible owner :("
+                                      }
+            --newGame Zelimo da posle smrti, jedino vodimo racuna o dogadjaju quit. Ne znam kako da uporedim da li je trenutni event Quit :/
+                -- | event == Quit = update event oldGame 
+                --     { stdGen = gen 
+                --     , psic = noviPsic
+                --     }
+                -- | otherwise = oldGame
+            newGame = update event oldGame 
+                                
+        when (running newGame) $ do
+            loop newGame
+    )   
+    
 
 runGame :: IO ()
 runGame = runCurses $ do
