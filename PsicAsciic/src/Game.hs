@@ -1,4 +1,4 @@
-module Game (runGame, drawAsciic) where
+module Game (runGame) where
 
 import qualified Data.Map as Map
 import Data.String
@@ -31,15 +31,97 @@ initialGame gen = Game True gen defaultPsic initialInventory
 
 update :: EventGame -> Game -> Game
 update Quit game = game { running = False }
-update Idle game@(Game _ _ psic inventory) = 
-    let newMood     = mood psic - 2
-        newHunger   = hunger psic - 5
-    in game { psic      = psic { mood = newMood
-                               , hunger = newHunger } 
-            , inventory = Map.adjust (+2) Water 
-                        $ Map.adjust (+1) Bone 
-                        $ Map.adjust (+1) Meat
+update Idle game@(Game _ oldGen psic inventory) = 
+    let (randMood, newGen)          = randomR (-3, 3) oldGen
+        (randHunger, newGen')       = randomR ( 0, 3) newGen
+        (randDirtiness, newGen'')   = randomR ( 0, 1) newGen'
+        (randWater, newGen''')      = randomR ( 0, 2) newGen''
+        (randBone, newGen'''')      = randomR ( 0, 1) newGen'''
+        (randMeat, newGen''''')     = randomR ( 0, 1) newGen''''
+        newMood                     = mood psic - randMood
+        newHunger                   = hunger psic - randHunger
+        newDirtiness                = dirtiness psic + randDirtiness
+    in game { stdGen    = newGen'''''
+            , psic      = updatePsicMood newMood
+                        $ updatePsicHunger newHunger
+                        $ updatePsicDirtiness newDirtiness
+                        $ psic
+            , inventory = Map.adjust (+randWater) Water 
+                        $ Map.adjust (+randBone) Bone 
+                        $ Map.adjust (+randMeat) Meat
                         $ inventory
+            }
+update Play game@(Game _ oldGen psic _) =
+    let (randMood, newGen)          = randomR (0, 10) oldGen 
+        (randHunger, newGen')       = randomR (0,  5) newGen
+        (randDirtiness, newGen'')   = randomR (0,  5) newGen'
+        newMood                     = mood psic + randMood
+        newHunger                   = hunger psic - randHunger
+        newDirtiness                = dirtiness psic + randDirtiness
+    in game { stdGen    = newGen''
+            , psic      = updatePsicMood newMood
+                        $ updatePsicHunger newHunger
+                        $ updatePsicDirtiness newDirtiness
+                        $ psic { psicSays = "I love playing with you, " 
+                                         ++ owner psic 
+                                         ++ "!" 
+                               }
+            }
+update Clean game@(Game _ oldGen psic _) =
+    let (randMood, newGen)          = randomR (0,  5) oldGen 
+        (randHunger, newGen')       = randomR (0,  5) newGen
+        (randDirtiness, newGen'')   = randomR (0, 10) newGen'
+        newMood                     = mood psic - randMood
+        newHunger                   = hunger psic - randHunger
+        newDirtiness                = dirtiness psic - randDirtiness
+    in game { stdGen    = newGen''
+            , psic      = updatePsicMood newMood
+                        $ updatePsicHunger newHunger
+                        $ updatePsicDirtiness newDirtiness
+                        $ psic { psicSays = "Wash washy wash washy wash wash!" }
+            }
+update Poop game@(Game _ oldGen psic _) =
+    let (randMood, newGen)          = randomR (0, 20) oldGen 
+        (randHunger, newGen')       = randomR (0, 10) newGen
+        (randDirtiness, newGen'')   = randomR (0, 20) newGen'
+        newMood                     = mood psic - randMood
+        newHunger                   = hunger psic - randHunger
+        newDirtiness                = dirtiness psic + randDirtiness
+    in game { stdGen    = newGen''
+            , psic      = updatePsicMood newMood
+                        $ updatePsicHunger newHunger
+                        $ updatePsicDirtiness newDirtiness
+                        $ psic { psicSays = "Aghe, sometnihg stinks! "
+                                         ++ "Can you, please, clean me?" 
+                               }
+            }
+update Hunger game@(Game _ oldGen psic _) =
+    let (randMood, newGen)          = randomR (0, 10) oldGen 
+        (randHunger, newGen')       = randomR (0, 20) newGen
+        (randDirtiness, newGen'')   = randomR (0,  5) newGen'
+        newMood                     = mood psic - randMood
+        newHunger                   = hunger psic - randHunger
+        newDirtiness                = dirtiness psic + randDirtiness
+    in game { stdGen    = newGen''
+            , psic      = updatePsicMood newMood
+                        $ updatePsicHunger newHunger
+                        $ updatePsicDirtiness newDirtiness
+                        $ psic { psicSays = "Aghe, I'm hungry! "
+                                         ++ "Can you, please, feed me?" 
+                               }
+            }
+update Sleep game@(Game _ oldGen psic _) =
+    let (randMood, newGen)          = randomR (0, 5) oldGen 
+        (randHunger, newGen')       = randomR (0, 5) newGen
+        (randDirtiness, newGen'')   = randomR (0, 5) newGen'
+        newMood                     = mood psic - randMood
+        newHunger                   = hunger psic - randHunger
+        newDirtiness                = dirtiness psic + randDirtiness
+    in game { stdGen    = newGen''
+            , psic      = updatePsicMood newMood
+                        $ updatePsicHunger newHunger
+                        $ updatePsicDirtiness newDirtiness
+                        $ psic { psicSays = "Good night! Zzzz..." }
             }
 update _    game = game -- Implement other actions
 
@@ -69,8 +151,10 @@ drawAsciic asciic xOffset yOffset =
 
 header :: Update ()
 header = do
-    moveCursor 1 19
-    drawString "Psic Asciic"
+    let name = "Psic Asciic"
+        len  = fromIntegral $ length name
+    moveCursor 1 (25 - (floor $ len / 2))
+    drawString name
     moveCursor 2 0
 
 body :: Psic -> Inventory -> Update ()
@@ -84,7 +168,8 @@ body psicState inventoryState = do
     moveCursor 3 30
     drawString "Dirtiness:"
     drawLineH (Just glyphBlock) (dirtinessLevel psicState)
-    drawAsciic asciic 5 20
+    drawAsciic asciic 5 22
+    drawSaying $ psicSays psicState
     moveCursor 13 3
     drawString "Water:"
     drawString $ "x" ++ (show $ inventoryLookup Water inventoryState)
@@ -94,6 +179,10 @@ body psicState inventoryState = do
     moveCursor 13 35
     drawString "Meat:"
     drawString $ "x" ++ (show $ inventoryLookup Meat inventoryState)
+    where drawSaying saying = do
+            let len = fromIntegral $ length saying
+            moveCursor 11 (25 - (floor $ len / 2))
+            drawString saying
  
 footer :: Update ()
 footer = do
