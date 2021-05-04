@@ -39,7 +39,7 @@ update Idle game@(Game _ oldGen psic inventory) =
         (randBone, newGen'''')      = randomR ( 0, 1) newGen'''
         (randMeat, newGen''''')     = randomR ( 0, 1) newGen''''
         newMood                     = mood psic - randMood
-        newHunger                   = hunger psic - randHunger
+        newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen'''''
             , psic      = updatePsicMood newMood
@@ -100,7 +100,7 @@ update Hunger game@(Game _ oldGen psic _) =
         (randHunger, newGen')       = randomR (0, 20) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic - randMood
-        newHunger                   = hunger psic - randHunger
+        newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen''
             , psic      = updatePsicMood newMood
@@ -168,7 +168,7 @@ body psicState inventoryState = do
     moveCursor 3 30
     drawString "Dirtiness:"
     drawLineH (Just glyphBlock) (dirtinessLevel psicState)
-    drawAsciic asciic 5 22
+    drawAsciic (psicLook psicState) 5 22
     drawSaying $ psicSays psicState
     moveCursor 13 3
     drawString "Water:"

@@ -2,7 +2,6 @@ module Asciic
     ( StatePsic(..)
     , Psic(..)
     , defaultPsic 
-    , asciic
     , feed
     , moodLevel
     , hungerLevel
@@ -29,6 +28,7 @@ data Psic = Psic
     , dirtiness :: Int
     , state     :: StatePsic
     , psicSays  :: String
+    , psicLook  :: String
     } deriving (Show, Read)
 
 
@@ -41,7 +41,7 @@ updatePsicMood newMood psic
 updatePsicHunger :: Int -> Psic -> Psic
 updatePsicHunger newHunger psic
     | newHunger < 0   = psic { hunger = 0 }
-    | newHunger > 100 = psic { hunger = 100 }
+    | newHunger > 100 = psic { hunger = 0, state = Dead, psicLook = asciicDead }
     | otherwise       = psic { hunger = newHunger }
 
 updatePsicDirtiness :: Int -> Psic -> Psic
@@ -58,6 +58,22 @@ asciic  = " /^ ^\\\n"
        ++ "/    |\n"
        ++ "V__) ||\n"
 
+asciicDead :: String
+asciicDead  = " /^ ^\\\n"
+       ++ "/ x x \\\n"
+       ++ "V\\ Y /V\n"
+       ++ " / - \\\n"
+       ++ "/    |\n"
+       ++ "V__) ||\n"
+
+asciicAngry :: String
+asciicAngry  = " /^ ^\\\n"
+       ++ "/ - - \\\n"
+       ++ "V\\ Y /V\n"
+       ++ " / - \\\n"
+       ++ "/    |\n"
+       ++ "V__) ||\n"
+
 defaultPsic :: Psic
 defaultPsic = Psic 
     { name      = "Asciic"
@@ -68,6 +84,7 @@ defaultPsic = Psic
     , dirtiness = 25
     , state     = Alive
     , psicSays  = "Hello there, " ++ owner defaultPsic ++ "!"
+    , psicLook  = asciic
     }
 
 fLevel :: (Psic -> Int) -> Psic -> Integer
