@@ -6,11 +6,15 @@ module Input
     , randomEvent
     ) where
 
+-------------------------------------------------------------------------------
+
 import Data.Maybe (fromJust)
 import Control.Monad.IO.Class (liftIO)
 import UI.NCurses
 import System.Random
 import Food
+
+-------------------------------------------------------------------------------
 
 data EventGame = Feed Food
                | Play
@@ -22,6 +26,7 @@ data EventGame = Feed Food
                | Quit
                deriving (Eq ,Show)
 
+-------------------------------------------------------------------------------
 
 nextEvent :: Curses EventGame
 nextEvent = let maybeEvent = fmap (event2EventGame . fromJust) . (`getEvent` Nothing)
@@ -46,5 +51,4 @@ randomEvent gen = do
           rand2EventGame 2 = Hunger
           rand2EventGame 3 = Sleep
           rand2EventGame 4 = Idle
-
 

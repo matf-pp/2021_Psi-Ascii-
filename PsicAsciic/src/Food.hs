@@ -5,11 +5,14 @@ module Food
     , dirtinessValue
     ) where
 
+-------------------------------------------------------------------------------
 
 data Food = Water
           | Bone
           | Meat
           deriving (Show, Read, Eq, Ord)
+
+-------------------------------------------------------------------------------
 
 moodValue :: Food -> Int
 moodValue Water = 1
@@ -17,8 +20,8 @@ moodValue Bone  = 10
 moodValue Meat  = 5
 
 hungerValue :: Food -> Int
-hungerValue Water = -2
-hungerValue Bone  = -10
+hungerValue Water = -5
+hungerValue Bone  = -15
 hungerValue Meat  = -20
 
 dirtinessValue :: Food -> Int
