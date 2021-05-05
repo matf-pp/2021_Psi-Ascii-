@@ -9,6 +9,7 @@ module Asciic
     , updatePsicMood
     , updatePsicHunger
     , updatePsicDirtiness
+    , setToSleep
     ) where
 
 import Data.Range
@@ -16,7 +17,11 @@ import Food
 
 
 data StatePsic = Alive
+               | Sleepy
                | Bored
+            --   | Eating
+               | Playing
+               | Pooping
                | Dead
                deriving (Show, Read, Eq)
 
@@ -32,6 +37,10 @@ data Psic = Psic
     , psicLook  :: String
     } deriving (Show, Read)
 
+setToSleep :: Psic -> Psic
+setToSleep psic = psic {state = Sleepy
+                       , psicSays = "Good night! Zzzz..."
+                       , psicLook = asciicSleepy }
 
 updatePsicMood :: Int -> Psic -> Psic
 updatePsicMood newMood psic
@@ -41,7 +50,10 @@ updatePsicMood newMood psic
                            , psicLook = asciicBored }
     | newMood > 100 = psic { mood = 100 }
     | state psic == Dead = psic {mood = 0}
-    | otherwise     = psic { mood = newMood }
+    | state psic == Sleepy = psic {mood = newMood
+                                  , psicLook = asciicSleepy}
+    | otherwise     = psic { mood = newMood
+                           , psicLook = asciic}
 
 updatePsicHunger :: Int -> Psic -> Psic
 updatePsicHunger newHunger psic
@@ -52,15 +64,16 @@ updatePsicHunger newHunger psic
                              , state     = Dead
                              , psicSays = "I died from starvation. You are terrible owner :("
                              , psicLook  = asciicDead }
-    | otherwise       = psic { hunger = newHunger
-                             , state = Alive
-                             , psicLook = asciic }
+    | otherwise       = psic { hunger = newHunger }
 
 updatePsicDirtiness :: Int -> Psic -> Psic
 updatePsicDirtiness newDirtiness psic
     | newDirtiness < 0   = psic { dirtiness = 0 }
     | newDirtiness > 100 = psic { dirtiness = 100 }
     | otherwise          = psic { dirtiness = newDirtiness }
+
+updatePsicState :: StatePsic -> Psic -> Psic
+updatePsicState currentState psic = psic {state = currentState}
 
 asciic :: String
 asciic  = " /^ ^\\\n"
@@ -75,6 +88,14 @@ asciicDead  = " /^ ^\\\n"
        ++ "/ x x \\\n"
        ++ "V\\ Y /V\n"
        ++ " / - \\\n"
+       ++ "/    |\n"
+       ++ "V__) ||\n"
+
+asciicSleepy :: String
+asciicSleepy  = " /^ ^\\\n"
+       ++ "/ _ _ \\\n"
+       ++ "V\\ Y /V\n"
+       ++ " / . \\\n"
        ++ "/    |\n"
        ++ "V__) ||\n"
 

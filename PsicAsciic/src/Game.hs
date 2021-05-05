@@ -51,13 +51,13 @@ update (Feed food) game@(Game _ oldGen psic inventory) =
             }
 
 update Idle game@(Game _ oldGen psic inventory) = 
-    let (randMood, newGen)          = randomR (-3, 3) oldGen
+    let (randMood, newGen)          = randomR ( 0, 3) oldGen
         (randHunger, newGen')       = randomR ( 0, 3) newGen
         (randDirtiness, newGen'')   = randomR ( 0, 1) newGen'
         (randWater, newGen''')      = randomR ( 0, 2) newGen''
         (randBone, newGen'''')      = randomR ( 0, 1) newGen'''
         (randMeat, newGen''''')     = randomR ( 0, 1) newGen''''
-        newMood                     = mood psic - randMood
+        newMood                     = mood psic + randMood
         newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen'''''
@@ -75,7 +75,7 @@ update Play game@(Game _ oldGen psic _) =
         (randHunger, newGen')       = randomR (0,  5) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic + randMood
-        newHunger                   = hunger psic - randHunger
+        newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen''
             , psic      = updatePsicMood newMood
@@ -84,6 +84,7 @@ update Play game@(Game _ oldGen psic _) =
                         $ psic { psicSays = "I love playing with you, " 
                                          ++ owner psic 
                                          ++ "!" 
+                               , state = Playing
                                }
             }
 update Clean game@(Game _ oldGen psic _) =
@@ -110,6 +111,7 @@ update Poop game@(Game _ oldGen psic _) =
                         $ updatePsicDirtiness newDirtiness
                         $ psic { psicSays = "Aghe, sometnihg stinks! "
                                          ++ "Can you, please, clean me?" 
+                               , state = Pooping
                                }
             }
 update Hunger game@(Game _ oldGen psic _) =
@@ -132,15 +134,16 @@ update Sleep game@(Game _ oldGen psic _) =
         (randHunger, newGen')       = randomR (0, 5) newGen
         (randDirtiness, newGen'')   = randomR (0, 5) newGen'
         newMood                     = mood psic + randMood
-        newHunger                   = hunger psic - randHunger
+        newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
     in game { stdGen    = newGen''
             , psic      = updatePsicMood newMood
                         $ updatePsicHunger newHunger
                         $ updatePsicDirtiness newDirtiness
-                        $ psic { psicSays = "Good night! Zzzz..." }
+                        $ setToSleep psic 
             }
-update _    game = game -- Implement other actions
+
+--update _    game = game -- Implement other actions
 
 inventoryLookup :: Food -> Inventory -> Integer
 inventoryLookup food inventory =
@@ -205,6 +208,24 @@ footer :: Update ()
 footer = do
     moveCursor 15 30
     drawString "(Press q to quit)"
+
+    moveCursor 17 3
+    drawString "Controls:"
+
+    moveCursor 18 5
+    drawString "p - play with Asccic"
+
+    moveCursor 19 5
+    drawString "w - give Asccic water"
+
+    moveCursor 20 5
+    drawString "b - give Asccic bone"
+
+    moveCursor 21 5
+    drawString "m - give Asccic meat"
+
+    moveCursor 22 5
+    drawString "s - set Asccic to sleep"
 
 drawGame :: Game -> Update ()
 drawGame (Game _ _ psicState inventoryState) = do
