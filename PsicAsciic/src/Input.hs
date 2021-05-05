@@ -20,7 +20,7 @@ data EventGame = Feed Food
                | Sleep
                | Idle
                | Quit
-               deriving Show
+               deriving (Eq ,Show)
 
 
 nextEvent :: Curses EventGame

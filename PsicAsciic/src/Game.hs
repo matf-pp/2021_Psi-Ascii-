@@ -231,13 +231,13 @@ loop oldGame = if ((state (psic oldGame)) /= Dead) then (do
                                       , state = Dead
                                       , psicSays  = "I died from starvation. You are terrible owner :("
                                       }
-            --newGame Zelimo da posle smrti, jedino vodimo racuna o dogadjaju quit. Ne znam kako da uporedim da li je trenutni event Quit :/
-                -- | event == Quit = update event oldGame 
-                --     { stdGen = gen 
-                --     , psic = noviPsic
-                --     }
-                -- | otherwise = oldGame
-            newGame = update event oldGame 
+            newGame 
+                | event == Quit = update event oldGame 
+                    { stdGen = gen 
+                    , psic = noviPsic
+                    }
+                | otherwise = oldGame
+             
                                 
         when (running newGame) $ do
             loop newGame

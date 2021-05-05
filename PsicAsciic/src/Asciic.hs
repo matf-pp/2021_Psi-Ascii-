@@ -40,16 +40,18 @@ updatePsicMood newMood psic
                            , psicSays = "Amuse me or I will die. I am dead serious. :|"
                            , psicLook = asciicBored }
     | newMood > 100 = psic { mood = 100 }
+    | state psic == Dead = psic {mood = 0}
     | otherwise     = psic { mood = newMood }
 
 updatePsicHunger :: Int -> Psic -> Psic
 updatePsicHunger newHunger psic
     | newHunger < 0   = psic { hunger   = 0 }
-    | newHunger > 100 = psic { hunger   = 0
-                             , mood     = 0
-                             , state    = Dead
+    | newHunger > 100 = psic { hunger    = 0
+                             , mood      = 0
+                             , dirtiness = 0
+                             , state     = Dead
                              , psicSays = "I died from starvation. You are terrible owner :("
-                             , psicLook = asciicDead }
+                             , psicLook  = asciicDead }
     | otherwise       = psic { hunger = newHunger
                              , state = Alive
                              , psicLook = asciic }
