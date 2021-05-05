@@ -16,6 +16,12 @@ type IndexedGlyphs = [IndexedGlyph]
 
 type Inventory = Map.Map Food Int
 
+findKey :: (Eq k) => k -> [(k,v)] -> Maybe v  
+findKey key [] = Nothing  
+findKey key ((k,v):xs) = if key == k  
+                            then Just v  
+                            else findKey key xs  
+
 data Game = Game 
     { running   :: Bool 
     , stdGen    :: StdGen
@@ -31,6 +37,25 @@ initialGame gen = Game True gen defaultPsic initialInventory
 
 update :: EventGame -> Game -> Game
 update Quit game = game { running = False }
+
+update (Feed food) game@(Game _ oldGen psic inventory) = 
+    let newMood         = mood psic + (moodValue food)
+        newHunger       = hunger psic + (hungerValue food)
+        newDirtiness    = dirtiness psic + (dirtinessValue food)
+        foodInMap       = inventoryLookup food inventory
+        psicNew      
+            | foodInMap /= 0 = updatePsicMood newMood
+                                $ updatePsicHunger newHunger
+                                $ updatePsicDirtiness newDirtiness
+                                $ psic
+            | otherwise = psic {psicSays = "There is no any " ++ (show food) ++ " in my bowl :("}
+        inventoryNew
+                    | foodInMap > 0 = Map.adjust pred food $ inventory
+                    | otherwise  = Map.adjust (*0) food $ inventory
+    in game { psic = psicNew
+            , inventory = inventoryNew
+            }
+
 update Idle game@(Game _ oldGen psic inventory) = 
     let (randMood, newGen)          = randomR (-3, 3) oldGen
         (randHunger, newGen')       = randomR ( 0, 3) newGen
