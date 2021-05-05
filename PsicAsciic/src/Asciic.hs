@@ -101,12 +101,12 @@ defaultPsic = Psic
 
 fLevel :: (Psic -> Int) -> Psic -> Integer
 fLevel f psic
-    | inRange ( 0 +=+  5) (f psic) = 0
-    | inRange ( 6 +=+ 10) (f psic) = 1
-    | inRange (11 +=+ 15) (f psic) = 2
-    | inRange (16 +=+ 20) (f psic) = 3
-    | inRange (21 +=+ 25) (f psic) = 4
-    | otherwise                    = 5
+    | inRange ( 0 +=+ 20) (f psic)  = 0
+    | inRange (21 +=+ 40) (f psic)  = 1
+    | inRange (41 +=+ 60) (f psic)  = 2
+    | inRange (61 +=+ 80) (f psic)  = 3
+    | inRange (81 +=+ 100) (f psic) = 4
+    | otherwise                     = 5
 
 hungerLevel :: Psic -> Integer
 hungerLevel = fLevel hunger
