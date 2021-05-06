@@ -199,8 +199,8 @@ body psicState inventoryState = do
 footer :: Update ()
 footer = do
     moveCursor 15 2
-    drawString "play(p) feed(w/b/m) sleep(s) idle(.)"
-    moveCursor 15 39
+    drawString "play(p) feed(w/b/m) idle(.)"
+    moveCursor 15 35
     drawString "quit(q)"
 
 drawGame :: Game -> Update ()

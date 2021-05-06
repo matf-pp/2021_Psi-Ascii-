@@ -38,7 +38,6 @@ nextEvent = let maybeEvent = fmap (event2EventGame . fromJust) . (`getEvent` Not
                   event2EventGame (EventCharacter 'm') = Just $ Feed Meat
                   event2EventGame (EventCharacter 'p') = Just $ Play
                   event2EventGame (EventCharacter 'c') = Just $ Clean
-                  event2EventGame (EventCharacter 's') = Just $ Sleep
                   event2EventGame (EventCharacter '.') = Just $ Idle
                   event2EventGame (EventCharacter 'q') = Just $ Quit
                   event2EventGame _                    = Nothing
