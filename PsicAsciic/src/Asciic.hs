@@ -124,7 +124,7 @@ psicSays psic
     | (state psic) == Pooping    = "Aghe, something stinks!"
     | (state psic) == Cleaning   = "Wash washy wash washy wash wash!"
     | (state psic) == Depression = "Asciic hanged himself! Game Over!"
-    | (state psic) == Mania      = "Asciic become manica! Game Over!"
+    | (state psic) == Mania      = "Asciic become maniac! Game Over!"
     | (state psic) == Overfed    = "Asciic died from obesity! Game Over!"
     | (state psic) == Starvation = "Asciic died from starvation! Game Over!"
     | (state psic) == OCD        = "Your OCD killed Asciic! Game Over!"
