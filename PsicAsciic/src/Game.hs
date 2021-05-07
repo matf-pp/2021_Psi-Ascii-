@@ -58,7 +58,7 @@ update (Feed food) game@(Game _ _ psic inventory) =
             , inventory = inventoryNew
             }
 update Idle game@(Game _ oldGen psic inventory) = 
-    let (randMood, newGen)          = randomR (-5, 5) oldGen
+    let (randMood, newGen)          = randomR (-10, 5) oldGen
         (randHunger, newGen')       = randomR ( 0, 5) newGen
         (randDirtiness, newGen'')   = randomR ( 0, 5) newGen'
         (randFood, newGen''')       = randomR ( 0, 2) newGen'' :: (Int, StdGen)
