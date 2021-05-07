@@ -51,7 +51,10 @@ update (Feed food) game@(Game _ _ psic inventory) =
         inventoryNew
                     | foodInInventory > 0 = Map.adjust pred food $ inventory
                     | otherwise           = Map.adjust (*0) food $ inventory
-    in game { psic = newPsic { age = 1 + (age psic) }
+        stateNew
+                | foodInInventory > 0 = Eating
+                | otherwise = state psic
+    in game { psic = newPsic { age = 1 + (age psic), state = stateNew }
             , inventory = inventoryNew
             }
 update Idle game@(Game _ oldGen psic inventory) = 
@@ -66,14 +69,14 @@ update Idle game@(Game _ oldGen psic inventory) =
             , psic      = updatePsicMood newMood
                         $ updatePsicHunger newHunger
                         $ updatePsicDirtiness newDirtiness
-                        $ psic { age = 1 + (age psic) }
+                        $ psic { age = 1 + (age psic), state = Existing }
             , inventory = Map.adjust (+1) (num2Food randFood) inventory
             }
     where num2Food 0 = Water
           num2Food 1 = Bone
           num2Food 2 = Meat
 update Play game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (10, 25) oldGen 
+    let (randMood, newGen)          = randomR (10, 20) oldGen 
         (randHunger, newGen')       = randomR (0,  5) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic + randMood
@@ -86,7 +89,7 @@ update Play game@(Game _ oldGen psic _) =
                         $ psic { age = 1 + (age psic), state = Playing }
             }
 update Clean game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (-10,  0) oldGen 
+    let (randMood, newGen)          = randomR (-5,  10) oldGen 
         (randDirtiness, newGen')    = randomR ( 25, 40) newGen
         newMood                     = mood psic + randMood
         newDirtiness                = dirtiness psic - randDirtiness
@@ -96,9 +99,9 @@ update Clean game@(Game _ oldGen psic _) =
                         $ psic { age = 1 + (age psic), state = Cleaning }
             }
 update Poop game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR ( 0, 30) oldGen 
+    let (randMood, newGen)          = randomR ( 0, 25) oldGen 
         (randHunger, newGen')       = randomR ( 0,  5) newGen
-        (randDirtiness, newGen'')   = randomR (10, 40) newGen'
+        (randDirtiness, newGen'')   = randomR (10, 30) newGen'
         newMood                     = mood psic - randMood
         newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
@@ -122,7 +125,7 @@ update Hunger game@(Game _ oldGen psic _) =
                         $ psic { age = 1 + (age psic), state = Hungry }
             }
 update Sleep game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (0, 5) oldGen 
+    let (randMood, newGen)          = randomR (-3, 5) oldGen 
         (randHunger, newGen')       = randomR (0,  5) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic + randMood

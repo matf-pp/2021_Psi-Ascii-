@@ -72,6 +72,14 @@ asciicAlive  = " /^ ^\\\n"
             ++ "/    |\n"
             ++ "V__) ||\n"
 
+asciicSleeping :: String
+asciicSleeping  = " /^ ^\\\n"
+                ++ "/ _ _ \\\n"
+                ++ "V\\ Y /V\n"
+                ++ " / ' \\\n"
+                ++ "/    |\n"
+                ++ "V__) ||\n"
+
 asciicDead :: String
 asciicDead  = " /^ ^\\\n"
            ++ "/ x x \\\n"
@@ -133,6 +141,7 @@ psicSays psic
 
 asciic2Draw :: Psic -> String
 asciic2Draw psic
-    | inValidState psic = asciicAlive
-    | otherwise         = asciicDead 
+    | state psic == Sleeping = asciicSleeping
+    | inValidState psic      = asciicAlive
+    | otherwise              = asciicDead 
 
