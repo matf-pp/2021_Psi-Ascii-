@@ -118,7 +118,7 @@ psicSays :: Psic -> String
 psicSays psic 
     | (state psic) == Existing   = "Hello there, " ++ owner psic ++ "!"
     | (state psic) == Sleeping   = "Good night! Zzzzz..."
-    | (state psic) == Hungry     = "Hey, I'm hungty!"
+    | (state psic) == Hungry     = "Hey, I'm hungry!"
     | (state psic) == Eating     = "Mmmm, noice!"
     | (state psic) == Playing    = "Love you, " ++ owner psic ++ "!"
     | (state psic) == Pooping    = "Aghe, something stinks!"

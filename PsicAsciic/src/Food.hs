@@ -20,9 +20,9 @@ moodValue Bone  = 10
 moodValue Meat  = 5
 
 hungerValue :: Food -> Int
-hungerValue Water = -5
+hungerValue Water = -10
 hungerValue Bone  = -15
-hungerValue Meat  = -20
+hungerValue Meat  = -25
 
 dirtinessValue :: Food -> Int
 dirtinessValue Water = 2

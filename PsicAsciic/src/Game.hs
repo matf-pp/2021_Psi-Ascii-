@@ -73,7 +73,7 @@ update Idle game@(Game _ oldGen psic inventory) =
           num2Food 1 = Bone
           num2Food 2 = Meat
 update Play game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (0, 20) oldGen 
+    let (randMood, newGen)          = randomR (10, 25) oldGen 
         (randHunger, newGen')       = randomR (0,  5) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic + randMood
@@ -87,7 +87,7 @@ update Play game@(Game _ oldGen psic _) =
             }
 update Clean game@(Game _ oldGen psic _) =
     let (randMood, newGen)          = randomR (-10,  0) oldGen 
-        (randDirtiness, newGen')    = randomR ( 30, 80) newGen
+        (randDirtiness, newGen')    = randomR ( 25, 40) newGen
         newMood                     = mood psic + randMood
         newDirtiness                = dirtiness psic - randDirtiness
     in game { stdGen    = newGen'
@@ -98,7 +98,7 @@ update Clean game@(Game _ oldGen psic _) =
 update Poop game@(Game _ oldGen psic _) =
     let (randMood, newGen)          = randomR ( 0, 30) oldGen 
         (randHunger, newGen')       = randomR ( 0,  5) newGen
-        (randDirtiness, newGen'')   = randomR (10, 70) newGen'
+        (randDirtiness, newGen'')   = randomR (10, 40) newGen'
         newMood                     = mood psic - randMood
         newHunger                   = hunger psic + randHunger
         newDirtiness                = dirtiness psic + randDirtiness
@@ -109,8 +109,8 @@ update Poop game@(Game _ oldGen psic _) =
                         $ psic { age = 1 + (age psic), state = Pooping }
             }
 update Hunger game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR ( 0, 10) oldGen 
-        (randHunger, newGen')       = randomR (10, 30) newGen
+    let (randMood, newGen)          = randomR ( 0, 5) oldGen 
+        (randHunger, newGen')       = randomR (10, 25) newGen
         (randDirtiness, newGen'')   = randomR ( 0,  5) newGen'
         newMood                     = mood psic - randMood
         newHunger                   = hunger psic + randHunger
@@ -122,7 +122,7 @@ update Hunger game@(Game _ oldGen psic _) =
                         $ psic { age = 1 + (age psic), state = Hungry }
             }
 update Sleep game@(Game _ oldGen psic _) =
-    let (randMood, newGen)          = randomR (5, 10) oldGen 
+    let (randMood, newGen)          = randomR (0, 5) oldGen 
         (randHunger, newGen')       = randomR (0,  5) newGen
         (randDirtiness, newGen'')   = randomR (0,  5) newGen'
         newMood                     = mood psic + randMood
@@ -199,8 +199,8 @@ body psicState inventoryState = do
 footer :: Update ()
 footer = do
     moveCursor 15 2
-    drawString "play(p) feed(w/b/m) idle(.)"
-    moveCursor 15 35
+    drawString "play(p) feed(w/b/m) clean(c) idle(.)"
+    moveCursor 15 40
     drawString "quit(q)"
 
 drawGame :: Game -> Update ()
